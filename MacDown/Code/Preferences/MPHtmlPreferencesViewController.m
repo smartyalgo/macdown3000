@@ -19,6 +19,7 @@ NS_INLINE NSString *MPPrismDefaultThemeName()
 
 @interface MPHtmlPreferencesViewController ()
 @property (weak) IBOutlet NSPopUpButton *stylesheetSelect;
+@property (weak) IBOutlet NSPopUpButton *darkStylesheetSelect;
 @property (weak) IBOutlet NSSegmentedControl *stylesheetFunctions;
 @property (weak) IBOutlet NSPopUpButton *highlightingThemeSelect;
 @property (weak) IBOutlet NSSegmentedControl *highlightingThemeFunctions;
@@ -65,6 +66,14 @@ NS_INLINE NSString *MPPrismDefaultThemeName()
         self.preferences.htmlStyleName = nil;
     else
         self.preferences.htmlStyleName = title;
+}
+
+// Issue #292: the stylesheet paired for the dark appearance. The empty first
+// item turns the pairing off.
+- (IBAction)changeDarkStylesheet:(NSPopUpButton *)sender
+{
+    NSString *title = sender.selectedItem.title;
+    self.preferences.htmlDarkStyleName = title.length ? title : nil;
 }
 
 - (IBAction)changeHighlightingTheme:(NSPopUpButton *)sender
@@ -149,21 +158,31 @@ NS_INLINE NSString *MPPrismDefaultThemeName()
 
 - (void)loadStylesheets
 {
-    self.stylesheetSelect.enabled = NO;
-    [self.stylesheetSelect removeAllItems];
-
     NSArray *itemTitles = MPListStylesheetsInPaths(
         MPDataDirectory(nil), [NSBundle mainBundle].resourcePath);
     itemTitles = [itemTitles sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
 
-    [self.stylesheetSelect addItemWithTitle:@""];
-    [self.stylesheetSelect addItemsWithTitles:itemTitles];
+    [self populateStylesheetPopup:self.stylesheetSelect
+                       withTitles:itemTitles
+                        selecting:self.preferences.htmlStyleName];
+    [self populateStylesheetPopup:self.darkStylesheetSelect
+                       withTitles:itemTitles
+                        selecting:self.preferences.htmlDarkStyleName];
+}
 
-    NSString *title = self.preferences.htmlStyleName;
+// Fills a stylesheet popup with an empty "off" item followed by the titles,
+// and preselects the current preference.
+- (void)populateStylesheetPopup:(NSPopUpButton *)popup
+                     withTitles:(NSArray *)itemTitles
+                      selecting:(NSString *)title
+{
+    popup.enabled = NO;
+    [popup removeAllItems];
+    [popup addItemWithTitle:@""];
+    [popup addItemsWithTitles:itemTitles];
     if (title.length)
-        [self.stylesheetSelect selectItemWithTitle:title];
-
-    self.stylesheetSelect.enabled = YES;
+        [popup selectItemWithTitle:title];
+    popup.enabled = YES;
 }
 
 - (void)loadHighlightingThemes

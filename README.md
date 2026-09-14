@@ -52,6 +52,7 @@ MacDown 3000 uses Hoedown to convert Markdown to HTML with live preview as you t
 - **GitHub Flavored Markdown** including tables, strikethrough (enabled by default), and autolinks
 - **Task lists** for GFM-style checkboxes, including the `[-]` partly-done (indeterminate) state
 - **Customizable rendering options** in Preferences
+- **Dark mode preview**: pair a dark stylesheet with your light one under Preferences > Rendering > Dark CSS. The preview follows the macOS appearance and switches live; printing and PDF export keep the light stylesheet
 
 ### Syntax Highlighting
 
