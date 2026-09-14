@@ -326,6 +326,7 @@ NS_INLINE BOOL MPAreNilableStringsEqual(NSString *s1, NSString *s2)
 @property BOOL smartypants;
 @property BOOL TOC;
 @property (copy) NSString *styleName;
+@property (copy) NSString *darkStyleName;
 @property BOOL frontMatter;
 @property BOOL syntaxHighlighting;
 @property BOOL mermaid;
@@ -539,15 +540,39 @@ NS_INLINE NSString *MPPreviewHeadTags(NSString *checkboxBridgeToken)
 
 #pragma mark - Accessor
 
+- (NSString *)delegateDarkStyleName
+{
+    id<MPRendererDelegate> delegate = self.delegate;
+    if (![delegate respondsToSelector:@selector(rendererDarkStyleName:)])
+        return nil;
+    return [delegate rendererDarkStyleName:self];
+}
+
+// Issue #292: With a dark theme paired, both sheets are emitted and gated on
+// prefers-color-scheme, so WebKit switches them from the view's effective
+// appearance (and keeps the light sheet for print, whose media type never
+// reports a dark appearance). Without one, the light sheet is emitted as is.
 - (NSArray *)baseStylesheets
 {
-    NSString *defaultStyleName =
+    NSString *lightPath =
         MPStylePathForName([self.delegate rendererStyleName:self]);
-    if (!defaultStyleName)
-        return @[];
-    NSURL *defaultStyle = [NSURL fileURLWithPath:defaultStyleName];
+    NSString *darkPath = MPStylePathForName([self delegateDarkStyleName]);
     NSMutableArray *stylesheets = [NSMutableArray array];
-    [stylesheets addObject:[MPStyleSheet CSSWithURL:defaultStyle]];
+    if (lightPath)
+    {
+        MPStyleSheet *light =
+            [MPStyleSheet CSSWithURL:[NSURL fileURLWithPath:lightPath]];
+        if (darkPath)
+            light.media = @"(prefers-color-scheme: light)";
+        [stylesheets addObject:light];
+    }
+    if (darkPath)
+    {
+        MPStyleSheet *dark =
+            [MPStyleSheet CSSWithURL:[NSURL fileURLWithPath:darkPath]];
+        dark.media = @"(prefers-color-scheme: dark)";
+        [stylesheets addObject:dark];
+    }
     return stylesheets;
 }
 
@@ -817,6 +842,9 @@ NS_INLINE NSString *MPPreviewHeadTags(NSString *checkboxBridgeToken)
     else if (!MPAreNilableStringsEqual(
             [d rendererStyleName:self], self.styleName))
         changed = YES;
+    else if (!MPAreNilableStringsEqual(
+            [self delegateDarkStyleName], self.darkStyleName))
+        changed = YES;
     else if ([d rendererCodeBlockAccesory:self] != self.codeBlockAccesory)
         changed = YES;
 
@@ -858,6 +886,7 @@ NS_INLINE NSString *MPPreviewHeadTags(NSString *checkboxBridgeToken)
     [delegate renderer:self didProduceHTMLOutput:html];
 
     self.styleName = [delegate rendererStyleName:self];
+    self.darkStyleName = [self delegateDarkStyleName];
     self.syntaxHighlighting = [delegate rendererHasSyntaxHighlighting:self];
     self.mermaid = [delegate rendererHasMermaid:self];
     self.graphviz = [delegate rendererHasGraphviz:self];

@@ -38,6 +38,9 @@
 @property (nonatomic) BOOL mathJax;
 @property (nonatomic) MPCodeBlockAccessoryType codeBlockAccessory;
 @property (nonatomic, copy) NSString *styleName;
+// Dark-appearance stylesheet (issue #292). nil (the default) means no
+// dark theme is paired, matching a fresh MPPreferences with the setting off.
+@property (nonatomic, copy) NSString *darkStyleName;
 @property (nonatomic, copy) NSString *highlightingThemeName;
 @property (nonatomic, copy) NSString *lastHTML;
 // Optional base URL for the cache-busting path (issue #110 / #318). When set,

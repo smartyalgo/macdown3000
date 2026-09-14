@@ -80,6 +80,11 @@
     return self.styleName;
 }
 
+- (NSString *)rendererDarkStyleName:(MPRenderer *)renderer
+{
+    return self.darkStyleName;
+}
+
 - (BOOL)rendererDetectsFrontMatter:(MPRenderer *)renderer
 {
     return self.detectFrontMatter;

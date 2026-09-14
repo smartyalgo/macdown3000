@@ -2086,6 +2086,11 @@ static BOOL MPScanFenceMarker(NSString *line, unichar *outChar, NSUInteger *outL
     return self.preferences.htmlStyleName;
 }
 
+- (NSString *)rendererDarkStyleName:(MPRenderer *)renderer
+{
+    return self.preferences.htmlDarkStyleName;
+}
+
 - (BOOL)rendererDetectsFrontMatter:(MPRenderer *)renderer
 {
     return self.preferences.htmlDetectFrontMatter;
@@ -2703,7 +2708,8 @@ static BOOL MPScanFenceMarker(NSString *line, unichar *outChar, NSUInteger *outL
 
     MPExportPanelAccessoryViewController *controller =
         [[MPExportPanelAccessoryViewController alloc] init];
-    controller.stylesIncluded = (BOOL)self.preferences.htmlStyleName;
+    controller.stylesIncluded = self.preferences.htmlStyleName.length > 0
+                                || self.preferences.htmlDarkStyleName.length > 0;
     controller.highlightingIncluded = self.preferences.htmlSyntaxHighlighting;
     panel.accessoryView = controller.view;
 
@@ -3249,6 +3255,10 @@ static BOOL MPScanFenceMarker(NSString *line, unichar *outChar, NSUInteger *outL
     NSString *stylePath = MPStylePathForName(self.preferences.htmlStyleName);
     if (stylePath)
         [self.renderer setTimestamp:now forResourcePath:stylePath];
+    NSString *darkStylePath =
+        MPStylePathForName(self.preferences.htmlDarkStyleName);
+    if (darkStylePath)
+        [self.renderer setTimestamp:now forResourcePath:darkStylePath];
     NSString *themePath =
         MPHighlightingThemeURLForName(
             self.preferences.htmlHighlightingThemeName).path;
