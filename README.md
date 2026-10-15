@@ -60,6 +60,7 @@ Code blocks get syntax highlighting via Prism, supporting numerous programming a
 ### Additional Rendering Tools
 
 - **Math notation** using TeX-like syntax ($$...$$, \[...\], \(...\), and optional $...$ blocks)
+- **Mermaid and Graphviz diagrams** rendered from fenced code blocks tagged `mermaid` or a Graphviz engine such as `dot`; each has its own toggle in Preferences › Rendering
 - **Jekyll front-matter** for static site generators
 - **Export to HTML or PDF** with customizable styling
 
