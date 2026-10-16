@@ -156,6 +156,7 @@
 		ISSUE318STYLERELBUILDFILE /* MPDocumentStyleUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE318STYLERELFILEREF /* MPDocumentStyleUpdateTests.m */; };
 		ISSUE325MJSCRLBUILDFILE /* MPMathJaxScrollTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE325MJSCRLFILEREF /* MPMathJaxScrollTests.m */; };
 		ISSUE331MRMDRNDRBUILDFILE /* MPMermaidRenderingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE331MRMDRNDRFILEREF /* MPMermaidRenderingTests.m */; };
+		ISSUE533DIAGTOGGLEBUILDFILE /* MPHtmlPreferencesDiagramTogglesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE533DIAGTOGGLEFILEREF /* MPHtmlPreferencesDiagramTogglesTests.m */; };
 		ISSUE332GVIZRNDRBUILDFILE /* MPGraphvizRenderingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE332GVIZRNDRFILEREF /* MPGraphvizRenderingTests.m */; };
 		ISSUE292DARKRNDRBUILDFILE /* MPDarkStyleRenderingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE292DARKRNDRFILEREF /* MPDarkStyleRenderingTests.m */; };
 		ISSUE292CLRSCHMBUILDFILE /* MPPreviewColorSchemeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ISSUE292CLRSCHMFILEREF /* MPPreviewColorSchemeTests.m */; };
@@ -736,6 +737,7 @@
 		ISSUE318STYLERELFILEREF /* MPDocumentStyleUpdateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPDocumentStyleUpdateTests.m; sourceTree = "<group>"; };
 		ISSUE325MJSCRLFILEREF /* MPMathJaxScrollTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPMathJaxScrollTests.m; sourceTree = "<group>"; };
 		ISSUE331MRMDRNDRFILEREF /* MPMermaidRenderingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPMermaidRenderingTests.m; sourceTree = "<group>"; };
+		ISSUE533DIAGTOGGLEFILEREF /* MPHtmlPreferencesDiagramTogglesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPHtmlPreferencesDiagramTogglesTests.m; sourceTree = "<group>"; };
 		ISSUE332GVIZRNDRFILEREF /* MPGraphvizRenderingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGraphvizRenderingTests.m; sourceTree = "<group>"; };
 		ISSUE292DARKRNDRFILEREF /* MPDarkStyleRenderingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPDarkStyleRenderingTests.m; sourceTree = "<group>"; };
 		ISSUE292CLRSCHMFILEREF /* MPPreviewColorSchemeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPPreviewColorSchemeTests.m; sourceTree = "<group>"; };
@@ -1187,6 +1189,7 @@
 				ISSUE313TOOLBARFILEREF /* MPToolbarControllerTests.m */,
 				ISSUE318STYLERELFILEREF /* MPDocumentStyleUpdateTests.m */,
 				ISSUE331MRMDRNDRFILEREF /* MPMermaidRenderingTests.m */,
+				ISSUE533DIAGTOGGLEFILEREF /* MPHtmlPreferencesDiagramTogglesTests.m */,
 				ISSUE332GVIZRNDRFILEREF /* MPGraphvizRenderingTests.m */,
 				ISSUE292DARKRNDRFILEREF /* MPDarkStyleRenderingTests.m */,
 				ISSUE292CLRSCHMFILEREF /* MPPreviewColorSchemeTests.m */,
@@ -1947,6 +1950,7 @@
 				ISSUE341IMGRENDERBUILDFILE /* MPImageRenderingTests.m in Sources */,
 				ISSUE318STYLERELBUILDFILE /* MPDocumentStyleUpdateTests.m in Sources */,
 				ISSUE331MRMDRNDRBUILDFILE /* MPMermaidRenderingTests.m in Sources */,
+				ISSUE533DIAGTOGGLEBUILDFILE /* MPHtmlPreferencesDiagramTogglesTests.m in Sources */,
 				ISSUE332GVIZRNDRBUILDFILE /* MPGraphvizRenderingTests.m in Sources */,
 				ISSUE292DARKRNDRBUILDFILE /* MPDarkStyleRenderingTests.m in Sources */,
 				ISSUE292CLRSCHMBUILDFILE /* MPPreviewColorSchemeTests.m in Sources */,
