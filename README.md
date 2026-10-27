@@ -133,6 +133,8 @@ The following editor themes and CSS files are extracted from [Mou](http://mouapp
 * GitHub
 * GitHub2
 
+The SynthWave '84 editor theme and CSS use the palette of [SynthWave '84](https://github.com/robb0wen/synthwave-vscode) by Robb Owen (MIT License).
+
 ## Contributing & Support
 
 MacDown 3000 is Free Software under the MIT License. Contributions are welcome!

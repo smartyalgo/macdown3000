@@ -789,4 +789,93 @@ static BOOL MPCustomPropertyResolves(NSString *css, NSUInteger *index,
     [webView close];
 }
 
+// Loads html in a WebView and returns the object produced by the JavaScript
+// expression, in which c(selector, property, pseudo) reads a computed style
+// value, optionally of a pseudo-element such as '::before'.
+static NSDictionary *MPComputedStylesForHTML(NSString *html,
+                                             NSString *expression)
+{
+    WebView *webView = [[WebView alloc] initWithFrame:NSMakeRect(0, 0, 400, 600)];
+    [webView.mainFrame loadHTMLString:html baseURL:nil];
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:5.0];
+    while ((webView.isLoading || !webView.mainFrame.DOMDocument.body)
+           && deadline.timeIntervalSinceNow > 0)
+    {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+            beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    }
+
+    NSString *script = [NSString stringWithFormat:
+        @"JSON.stringify((function () {"
+         "function c(selector, property, pseudo) {"
+         "return getComputedStyle(document.querySelector(selector),"
+         " pseudo || null)[property];}"
+         "return %@;})())", expression];
+    NSString *json = [webView stringByEvaluatingJavaScriptFromString:script];
+    [webView close];
+    return [NSJSONSerialization
+        JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+                   options:0 error:NULL];
+}
+
+/*
+ * The renderer emits the preview style before the Prism theme sheet, so the
+ * SynthWave '84 code-block rules carry !important. Without them every Prism
+ * theme repaints the block: prism.css gives it a light background, black text
+ * and its own keyword colour. The !important rules must still leave the
+ * ::before pseudo-element displayed, because show-information.css (the
+ * "Custom" code block accessory, emitted after the Prism sheet) draws the
+ * language label in it.
+ */
+- (void)testSynthWaveCodeBlocksStayDarkUnderEveryPrismTheme
+{
+    NSString *stylePath =
+        [[NSBundle mainBundle] pathForResource:@"SynthWave '84"
+                                        ofType:kMPStyleFileExtension
+                                   inDirectory:kMPStylesDirectoryName];
+    NSString *styleCSS = MPReadFileOfPath(stylePath);
+    XCTAssertGreaterThan(styleCSS.length, 0u,
+                         @"SynthWave '84.css should be readable");
+
+    NSString *accessoryPath =
+        [[NSBundle mainBundle] pathForResource:@"show-information"
+                                        ofType:@"css"
+                                   inDirectory:@"Extensions"];
+    NSString *accessoryCSS = MPReadFileOfPath(accessoryPath);
+    XCTAssertGreaterThan(accessoryCSS.length, 0u,
+                         @"show-information.css should be readable");
+
+    NSArray *prismThemePaths = [[NSBundle mainBundle]
+        pathsForResourcesOfType:@"css" inDirectory:@"Prism/themes"];
+    XCTAssertGreaterThan(prismThemePaths.count, 0u,
+                         @"Should find bundled Prism themes");
+
+    for (NSString *prismThemePath in prismThemePaths)
+    {
+        NSString *html = [NSString stringWithFormat:
+            @"<html><head><style>%@</style><style>%@</style><style>%@</style>"
+            @"</head><body>"
+            @"<pre class=\"language-js\" data-information=\"js\">"
+            @"<code class=\"language-js\">"
+            @"<span class=\"token keyword\">if</span></code></pre>"
+            @"</body></html>",
+            styleCSS, MPReadFileOfPath(prismThemePath), accessoryCSS];
+        NSDictionary *styles = MPComputedStylesForHTML(html,
+            @"{pre: c('pre', 'backgroundColor'), code: c('code', 'color'),"
+             "keyword: c('.token.keyword', 'color'),"
+             "labelShown: c('pre', 'display', '::before') !== 'none'}");
+
+        NSString *prismThemeName = prismThemePath.lastPathComponent;
+        XCTAssertEqualObjects(styles[@"pre"], @"rgb(36, 27, 47)",
+                              @"Code block background under %@", prismThemeName);
+        XCTAssertEqualObjects(styles[@"code"], @"rgb(255, 255, 255)",
+                              @"Code text color under %@", prismThemeName);
+        XCTAssertEqualObjects(styles[@"keyword"], @"rgb(254, 222, 93)",
+                              @"Keyword color under %@", prismThemeName);
+        XCTAssertEqualObjects(styles[@"labelShown"], @YES,
+                              @"Code block accessory label under %@",
+                              prismThemeName);
+    }
+}
+
 @end
