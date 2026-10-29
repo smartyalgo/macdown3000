@@ -11,6 +11,9 @@ body {
   background-color: #262335;
   color: #ffffff;
   padding: 30px;
+  /* Mermaid theme, read by mermaid.init.js. Cursor renders Mermaid with
+     Mermaid's built-in dark theme under the SynthWave '84 color theme. */
+  --macdown-mermaid-theme: dark;
 }
 
 body>*:first-child {

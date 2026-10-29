@@ -133,7 +133,7 @@ The following editor themes and CSS files are extracted from [Mou](http://mouapp
 * GitHub
 * GitHub2
 
-The SynthWave '84 editor theme and CSS use the palette of [SynthWave '84](https://github.com/robb0wen/synthwave-vscode) by Robb Owen (MIT License).
+The SynthWave '84 editor theme and CSS use the palette of [SynthWave '84](https://github.com/robb0wen/synthwave-vscode) by Robb Owen (MIT License). The SynthWave '84 CSS renders Mermaid diagrams with Mermaid's built-in `dark` theme, as Cursor does under that color theme; any CSS can pick a Mermaid theme by declaring `--macdown-mermaid-theme` on `body`, and a CSS that declares none gets `forest`.
 
 ## Contributing & Support
 

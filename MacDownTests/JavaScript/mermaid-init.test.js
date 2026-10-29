@@ -25,6 +25,7 @@ const vm = require('node:vm');
     },
     window: { addEventListener: (event, callback) => { onLoad = callback; } },
     console: { warn() {}, error() {} },
+    getComputedStyle: () => ({ getPropertyValue: () => '' }),
     mermaid: { initialize() {}, async render() { throw new Error(message); } }
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,
@@ -53,6 +54,7 @@ const vm = require('node:vm');
     },
     window: { addEventListener: (event, callback) => { onLoad = callback; } },
     console: { warn() {}, error() {} },
+    getComputedStyle: () => ({ getPropertyValue: () => '' }),
     setTimeout: callback => { scheduled = callback; },
     MutationObserver: class {
       constructor(callback) { onMutation = callback; }
@@ -82,4 +84,44 @@ const vm = require('node:vm');
   assert.deepEqual(rendered, ['old graph', 'new graph']);
   assert.equal(newPre.outerHTML, '<svg>new graph</svg>');
   process.stdout.write('Mermaid replaced DOM during pending render: passed\n');
+})().catch(error => { console.error(error); process.exitCode = 1; });
+
+// The preview style picks the Mermaid theme through the --macdown-mermaid-theme
+// custom property on body; a style that declares none gets forest.
+(async function () {
+  const themeInEffectAtRender = [];
+  const renderWithDeclaredTheme = async (declared) => {
+    let onLoad;
+    let theme;
+    const pre = { tagName: 'PRE' };
+    const code = { textContent: 'graph TD; A-->B', parentElement: pre };
+    const context = {
+      document: {
+        readyState: 'complete', body: { contains: node => node === pre },
+        querySelectorAll: () => [code],
+        createElement: () => ({ style: {} })
+      },
+      window: { addEventListener: (event, callback) => { onLoad = callback; } },
+      console: { warn() {}, error() {} },
+      getComputedStyle: element => ({
+        getPropertyValue: name =>
+          element === context.document.body && name === '--macdown-mermaid-theme'
+            ? declared : ''
+      }),
+      mermaid: {
+        initialize(config) { theme = config.theme; },
+        async render() {
+          themeInEffectAtRender.push(theme);
+          return { svg: '<svg></svg>' };
+        }
+      }
+    };
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname,
+      '../../MacDown/Resources/Extensions/mermaid.init.js'), 'utf8'), context);
+    await onLoad();
+  };
+  await renderWithDeclaredTheme(' dark ');
+  await renderWithDeclaredTheme('');
+  assert.deepEqual(themeInEffectAtRender, ['dark', 'forest']);
+  process.stdout.write('Mermaid theme follows the preview style: passed\n');
 })().catch(error => { console.error(error); process.exitCode = 1; });

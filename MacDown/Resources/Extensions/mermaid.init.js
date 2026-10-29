@@ -10,18 +10,29 @@
     return;
   }
 
-  // Use 'forest' theme via API instead of external CSS to fix gantt rendering
+  // The theme is set via API instead of external CSS to fix gantt rendering
   // issues (GitHub issue #18). Mermaid 8.0+ requires theme-based configuration.
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: 'forest',
-    flowchart: {
-      htmlLabels: false,
-      useMaxWidth: true
-    },
-    securityLevel: 'antiscript',
-    logLevel: 'error'
-  });
+  // A preview style picks the theme by declaring --macdown-mermaid-theme on
+  // body (SynthWave '84 declares 'dark', as Cursor uses under that color
+  // theme); styles that declare none keep 'forest'. The property is read at
+  // each render, when the active style sheet has loaded. Diagrams already on
+  // the page keep their theme until the next render, so flipping the macOS
+  // appearance with paired light and dark styles updates them on the next
+  // document render.
+  var configureMermaidForStyle = function() {
+    var declaredTheme = getComputedStyle(document.body)
+      .getPropertyValue('--macdown-mermaid-theme').trim();
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: declaredTheme || 'forest',
+      flowchart: {
+        htmlLabels: false,
+        useMaxWidth: true
+      },
+      securityLevel: 'antiscript',
+      logLevel: 'error'
+    });
+  };
 
   // Generate unique ID to avoid collisions on re-renders
   var renderCount = 0;
@@ -44,6 +55,7 @@
     if (domAll.length === 0) return;
 
     rendering = true;
+    configureMermaidForStyle();
     try {
       for (var i = 0; i < domAll.length; i++) {
         var codeElement = domAll[i];
