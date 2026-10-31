@@ -63,6 +63,9 @@ extern NSString * const MPDidDetectFreshInstallationNotification;
 
 @property (assign) NSString *htmlTemplateName;
 @property (assign) NSString *htmlStyleName;
+/// Stylesheet used instead of htmlStyleName while the preview's effective
+/// appearance is dark. nil or empty disables the pairing (issue #292).
+@property (assign) NSString *htmlDarkStyleName;
 @property (assign) BOOL htmlDetectFrontMatter;
 @property (assign) BOOL htmlTaskList;
 @property (assign) BOOL htmlHideHorizontalRules;

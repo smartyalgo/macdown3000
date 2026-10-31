@@ -86,6 +86,28 @@
                           @"CSS, full link");
 }
 
+// A stylesheet with a media query carries it as a media attribute on both
+// the <link> and the embedded <style> form, so the preview's dark theme can
+// be gated on prefers-color-scheme (GitHub issue #292).
+- (void)testCSSWithMedia
+{
+    NSURL *url = [self.bundle URLForResource:@"test" withExtension:@"css"];
+    MPStyleSheet *ss = [MPStyleSheet CSSWithURL:url];
+    ss.media = @"(prefers-color-scheme: dark)";
+
+    NSString *linkTag =
+        @"<link rel=\"stylesheet\" type=\"text/css\" "
+        @"media=\"(prefers-color-scheme: dark)\" href=\"%@\">";
+    linkTag = [NSString stringWithFormat:linkTag, url.absoluteString];
+    NSString *styleTag =
+        @"<style type=\"text/css\" media=\"(prefers-color-scheme: dark)\">\n"
+        @"body { font-size: 15px; }\n</style>";
+    XCTAssertEqualObjects([ss htmlForOption:MPAssetEmbedded], styleTag,
+                          @"CSS with media, embedded");
+    XCTAssertEqualObjects([ss htmlForOption:MPAssetFullLink], linkTag,
+                          @"CSS with media, full link");
+}
+
 - (void)testJavaScript
 {
     NSURL *url = [self.bundle URLForResource:@"test" withExtension:@"js"];

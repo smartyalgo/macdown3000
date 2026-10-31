@@ -66,11 +66,17 @@ NSString * const kMPMathJaxConfigType = @"text/x-mathjax-config";
                                    reason:reason userInfo:nil];
 }
 
+- (void)populateContext:(NSMutableDictionary *)context
+{
+    // Subclasses add template variables here.
+}
+
 - (NSString *)htmlForOption:(MPAssetOption)option
 {
     NSMutableDictionary *context =
         [NSMutableDictionary dictionaryWithObject:self.typeName
                                            forKey:@"typeName"];
+    [self populateContext:context];
     switch (option)
     {
         case MPAssetNone:
@@ -115,6 +121,12 @@ NSString * const kMPMathJaxConfigType = @"text/x-mathjax-config";
     return [super assetWithURL:url andType:kMPCSSType];
 }
 
+- (void)populateContext:(NSMutableDictionary *)context
+{
+    if (self.media.length)
+        context[@"media"] = self.media;
+}
+
 - (NSString *)templateForOption:(MPAssetOption)option
 {
     NSString *template = nil;
@@ -125,13 +137,15 @@ NSString * const kMPMathJaxConfigType = @"text/x-mathjax-config";
         case MPAssetEmbedded:
             if (self.url.isFileURL)
             {
-                template = (@"<style type=\"{{ typeName }}\">\n"
+                template = (@"<style type=\"{{ typeName }}\""
+                            @"{{#if media}} media=\"{{ media }}\"{{/if}}>\n"
                             @"{{{ content }}}\n</style>");
                 break;
             }
             // Non-file URLs fallthrough to be treated as full links.
         case MPAssetFullLink:
-            template = (@"<link rel=\"stylesheet\" type=\"{{ typeName }}\" "
+            template = (@"<link rel=\"stylesheet\" type=\"{{ typeName }}\""
+                        @"{{#if media}} media=\"{{ media }}\"{{/if}} "
                         @"href=\"{{ url }}\">");
             break;
     }

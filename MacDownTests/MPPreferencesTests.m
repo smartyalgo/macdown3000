@@ -1227,4 +1227,29 @@
         [defaults removeObjectForKey:@"MPDidApplyTaskListDefaultFix"];
 }
 
+#pragma mark - Dark preview stylesheet (GitHub issue #292)
+
+// The dark CSS name persists through NSUserDefaults under its own key, and
+// assigning nil clears it (the Rendering pane's empty popup item means off).
+- (void)testHtmlDarkStyleNameRoundTripsAndNilClears
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *original = self.preferences.htmlDarkStyleName;
+
+    self.preferences.htmlDarkStyleName = @"Github2 (dark)";
+    XCTAssertTrue([self.preferences synchronize]);
+    XCTAssertEqualObjects([defaults stringForKey:@"htmlDarkStyleName"],
+                          @"Github2 (dark)");
+    XCTAssertEqualObjects(self.preferences.htmlDarkStyleName,
+                          @"Github2 (dark)");
+
+    self.preferences.htmlDarkStyleName = nil;
+    XCTAssertTrue([self.preferences synchronize]);
+    XCTAssertNil(self.preferences.htmlDarkStyleName);
+    XCTAssertNil([defaults stringForKey:@"htmlDarkStyleName"]);
+
+    self.preferences.htmlDarkStyleName = original;
+    [self.preferences synchronize];
+}
+
 @end

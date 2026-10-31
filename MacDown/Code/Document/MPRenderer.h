@@ -74,4 +74,10 @@ typedef NS_ENUM(NSUInteger, MPCodeBlockAccessoryType)
 /// Used for cache-busting local resource URLs (issue #110).
 - (NSURL *)rendererBaseURL:(MPRenderer *)renderer;
 
+/// Name of the stylesheet paired with rendererStyleName: for the dark
+/// appearance (issue #292). When it resolves to a file, the light sheet is
+/// gated on (prefers-color-scheme: light) and this one on
+/// (prefers-color-scheme: dark). nil or empty leaves the light sheet ungated.
+- (NSString *)rendererDarkStyleName:(MPRenderer *)renderer;
+
 @end

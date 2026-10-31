@@ -29,6 +29,9 @@ extern NSString * const kMPMathJaxConfigType;
 
 
 @interface MPStyleSheet : MPAsset
+/// Optional media query emitted as the media attribute of the <link> or
+/// <style> tag, e.g. "(prefers-color-scheme: dark)". nil emits no attribute.
+@property (copy) NSString *media;
 + (instancetype)CSSWithURL:(NSURL *)url;
 @end
 
