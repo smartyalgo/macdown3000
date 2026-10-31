@@ -607,4 +607,32 @@
     }
 }
 
+// Every bundled editor theme must parse without errors. MPDocument clears the
+// editor theme preference when parsing reports an error, so a malformed
+// bundled theme would silently vanish from the editor instead of failing.
+- (void)testBundledThemesParseWithoutErrors
+{
+    NSArray *themePaths = [[NSBundle mainBundle]
+        pathsForResourcesOfType:kMPThemeFileExtension
+                    inDirectory:kMPThemesDirectoryName];
+    XCTAssertTrue(themePaths.count > 0,
+                  @"Should find bundled editor themes to test");
+
+    for (NSString *themePath in themePaths) {
+        NSString *stylesheet = MPReadFileOfPath(themePath);
+        XCTAssertTrue(stylesheet.length > 0,
+                      @"Theme '%@' should have readable content",
+                      themePath.lastPathComponent);
+
+        __block NSArray *reportedErrors = nil;
+        [self.highlighter applyStylesFromStylesheet:stylesheet
+                                   withErrorHandler:^(NSArray *errorMessages) {
+            reportedErrors = errorMessages;
+        }];
+        XCTAssertNil(reportedErrors,
+                     @"Theme '%@' should parse without errors: %@",
+                     themePath.lastPathComponent, reportedErrors);
+    }
+}
+
 @end

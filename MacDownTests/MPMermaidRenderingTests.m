@@ -11,6 +11,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <WebKit/WebKit.h>
 #import "MPRenderer.h"
 #import "MPRendererTestHelpers.h"
 #import "hoedown/document.h"
@@ -403,6 +404,67 @@
                   @"Should include mermaid init script");
     XCTAssertTrue([self.delegate.lastHTML containsString:@"viz.init.js"],
                   @"Should include graphviz init script alongside mermaid");
+}
+
+
+#pragma mark - Mermaid Theme Follows the Preview Style
+
+// Renders the export HTML of one Mermaid fence under the named preview style
+// in a WebView and returns the computed fill of the first node shape. The
+// fill identifies the Mermaid theme: each built-in theme has its own node
+// background. Fails the test when no diagram appears within the deadline.
+- (NSString *)mermaidNodeFillUnderStyle:(NSString *)styleName
+{
+    self.delegate.extensions = HOEDOWN_EXT_FENCED_CODE;
+    self.delegate.mermaid = YES;
+    self.delegate.styleName = styleName;
+    self.dataSource.markdown = @"```mermaid\ngraph TD;\n    A-->B;\n```";
+    [self.renderer parseMarkdown:self.dataSource.markdown];
+    NSString *html = [self.renderer HTMLForExportWithStyles:YES
+                                                highlighting:NO];
+
+    WebView *webView = [[WebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600)];
+    [webView.mainFrame loadHTMLString:html baseURL:nil];
+
+    NSString *script =
+        @"(function () {"
+         "var shape = document.querySelector("
+         "'svg[id^=\"mermaid_\"] .node rect, svg[id^=\"mermaid_\"] .node path,"
+         " svg[id^=\"mermaid_\"] .node polygon');"
+         "return shape ? getComputedStyle(shape).fill : '';})()";
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:20.0];
+    NSString *fill = @"";
+    while (fill.length == 0 && deadline.timeIntervalSinceNow > 0)
+    {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+            beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+        fill = [webView stringByEvaluatingJavaScriptFromString:script] ?: @"";
+    }
+    [webView close];
+
+    XCTAssertGreaterThan(fill.length, 0u,
+                         @"Mermaid rendered no diagram under %@ within 20 s",
+                         styleName);
+    return fill;
+}
+
+// Cursor renders Mermaid with Mermaid's built-in dark theme under the
+// SynthWave '84 color theme. The dark theme's node background is #1f2020.
+- (void)testSynthWaveStyleRendersMermaidWithDarkTheme
+{
+    NSString *fill = [self mermaidNodeFillUnderStyle:@"SynthWave '84"];
+    XCTAssertEqualObjects(fill, @"rgb(31, 32, 32)",
+                          @"SynthWave '84 should render Mermaid with the dark "
+                          @"theme (node background #1f2020)");
+}
+
+// Every other style keeps the forest theme, whose node background is #cde498.
+- (void)testOtherStylesRenderMermaidWithForestTheme
+{
+    NSString *fill = [self mermaidNodeFillUnderStyle:@"GitHub2"];
+    XCTAssertEqualObjects(fill, @"rgb(205, 228, 152)",
+                          @"GitHub2 should render Mermaid with the forest "
+                          @"theme (node background #cde498)");
 }
 
 @end
